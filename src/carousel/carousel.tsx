@@ -10,12 +10,13 @@ import {
   useMemo,
   useRef,
   MutableRefObject,
+  CSSProperties,
 } from "react";
 import useResizeObserver from "use-resize-observer";
 import "./styles.css";
 import { filterChildren,mergeRefs } from "./utils";
 
-export type CarouselProps = {};
+export type CarouselProps = {containerStyle?:CSSProperties,wrapperStyle?:CSSProperties,panOnHover?:boolean};
 export type Node = {
   node: HTMLDivElement;
   key: string;
@@ -37,7 +38,7 @@ export const Carousel = forwardRef<
   CarouselHandle,
   PropsWithChildren<Partial<CarouselProps>>
 >((props, carouselRef) => {
-  const { children } = props;
+  const { children,containerStyle,panOnHover=false,wrapperStyle} = props;
   const childItems = useMemo(
     () => filterChildren(children, "CarouselItem"),
     [children]
@@ -224,8 +225,6 @@ export const Carousel = forwardRef<
     (clientX: number) => {
       let deltaX = clientX - lastPointer.current;
       lastPointer.current = clientX;
-
-      // console.log(deltaX)
       swipeDistance.current += deltaX;
       pan(deltaX);
     },
@@ -237,6 +236,7 @@ export const Carousel = forwardRef<
       if (overShooting.current !== 0) {
         animate(x, overShooting.current === -1 ? 0 : -1 * maxScroll.current, {
           type: "spring",
+          velocity:x.getVelocity(),
           bounce: 0,
         });
       }
@@ -270,7 +270,7 @@ export const Carousel = forwardRef<
     animate(progress, clamp(Math.abs(newX / maxScroll.current), 0, 1));
   }, [x, progress]);
 
-  const panOnHover = useCallback(
+  const panOnHoverCb = useCallback(
     (clientX: number) => {
       const container = containerRef.current;
       const active = activeIndex.current;
@@ -348,13 +348,13 @@ export const Carousel = forwardRef<
         handlePanning(e.clientX);
         return;
       }
-      panOnHover(e.clientX);
+   if(panOnHover) {  panOnHoverCb(e.clientX)};
     };
     const onMouseUp = (e: MouseEvent) => {
       handlePointUp(e.clientX);
     };
     const onMouseLeave = (e: MouseEvent) => {
-      console.log("mouse leave");
+  
       handlePointUp();
       //  handlePointUp(e.clientX);
     };
@@ -477,11 +477,12 @@ export const Carousel = forwardRef<
   }
 
   return (
-    <div ref={containerRef} className="carousel carousel-container">
+    <div ref={containerRef} style={containerStyle} className="carousel carousel-container">
       <motion.div
+    
         ref={mergeRefs(wrapperRef, ref)}
-        style={{ x }}
-        className="carousel-wrapper "
+        style={{...wrapperStyle, x }}
+        className="carousel-wrapper"
       >
         {renderSlides()}
       </motion.div>

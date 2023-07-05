@@ -1,11 +1,11 @@
 {
-  "name": "react-typescript",
+  "name": "framer-carousel",
   "version": "1.0.0",
-  "description": "React and TypeScript example starter project",
+  "description": "carousel made with framer",
   "keywords": [
     "typescript",
     "react",
-    "starter"
+    "framer","carousel"
   ],
   "main": "src/index.tsx",
   "dependencies": {
