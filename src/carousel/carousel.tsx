@@ -1,5 +1,10 @@
-
-import { animate, clamp, motion,MotionValue, useMotionValue } from "framer-motion";
+import {
+  animate,
+  clamp,
+  motion,
+  MotionValue,
+  useMotionValue,
+} from "framer-motion";
 import {
   PropsWithChildren,
   cloneElement,
@@ -14,9 +19,13 @@ import {
 } from "react";
 import useResizeObserver from "use-resize-observer";
 import "./styles.css";
-import { filterChildren,mergeRefs } from "./utils";
+import { filterChildren, mergeRefs } from "./utils";
 
-export type CarouselProps = {containerStyle?:CSSProperties,wrapperStyle?:CSSProperties,panOnHover?:boolean};
+export type CarouselProps = {
+  containerStyle?: CSSProperties;
+  wrapperStyle?: CSSProperties;
+  panOnHover?: boolean;
+};
 export type Node = {
   node: HTMLDivElement;
   key: string;
@@ -38,7 +47,7 @@ export const Carousel = forwardRef<
   CarouselHandle,
   PropsWithChildren<Partial<CarouselProps>>
 >((props, carouselRef) => {
-  const { children,containerStyle,panOnHover=false,wrapperStyle} = props;
+  const { children, containerStyle, panOnHover = false, wrapperStyle } = props;
   const childItems = useMemo(
     () => filterChildren(children, "CarouselItem"),
     [children]
@@ -126,6 +135,7 @@ export const Carousel = forwardRef<
       node.offsetWidth,
     ]);
 
+    console.log(nodeOffsets);
     const passedVelocityThresold = Math.abs(panVelocity) / 10 > 3;
 
     for (
@@ -134,7 +144,6 @@ export const Carousel = forwardRef<
       i++, j--
     ) {
       let offset;
-
       if (direction < 0 && -1 * currentX < (offset = nodeOffsets[i][0])) {
         active = i;
         if (
@@ -152,7 +161,7 @@ export const Carousel = forwardRef<
         -1 * currentX > (offset = nodeOffsets[j][0])
       ) {
         active = j;
-        if (
+        if ( 
           !passedVelocityThresold &&
           -1 * currentX > nodeOffsets[j + 1][0] - nodeOffsets[j][1] / 2
         ) {
@@ -236,7 +245,7 @@ export const Carousel = forwardRef<
       if (overShooting.current !== 0) {
         animate(x, overShooting.current === -1 ? 0 : -1 * maxScroll.current, {
           type: "spring",
-          velocity:x.getVelocity(),
+          velocity: x.getVelocity(),
           bounce: 0,
         });
       }
@@ -348,13 +357,14 @@ export const Carousel = forwardRef<
         handlePanning(e.clientX);
         return;
       }
-   if(panOnHover) {  panOnHoverCb(e.clientX)};
+      if (panOnHover) {
+        panOnHoverCb(e.clientX);
+      }
     };
     const onMouseUp = (e: MouseEvent) => {
       handlePointUp(e.clientX);
     };
     const onMouseLeave = (e: MouseEvent) => {
-  
       handlePointUp();
       //  handlePointUp(e.clientX);
     };
@@ -477,11 +487,14 @@ export const Carousel = forwardRef<
   }
 
   return (
-    <div ref={containerRef} style={containerStyle} className="carousel carousel-container">
+    <div
+      ref={containerRef}
+      style={containerStyle}
+      className="carousel carousel-container"
+    >
       <motion.div
-    
         ref={mergeRefs(wrapperRef, ref)}
-        style={{...wrapperStyle, x }}
+        style={{ ...wrapperStyle, x }}
         className="carousel-wrapper"
       >
         {renderSlides()}
@@ -492,5 +505,4 @@ export const Carousel = forwardRef<
 
 Carousel.displayName = "Carousel";
 
-
-export default Carousel
+export default Carousel;
